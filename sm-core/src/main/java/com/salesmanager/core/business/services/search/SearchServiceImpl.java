@@ -1,31 +1,5 @@
 package com.salesmanager.core.business.services.search;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.helper.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
-
 import com.salesmanager.core.business.configuration.ApplicationSearchConfiguration;
 import com.salesmanager.core.business.constants.Constants;
 import com.salesmanager.core.business.exception.ServiceException;
@@ -44,14 +18,25 @@ import com.salesmanager.core.model.catalog.product.manufacturer.Manufacturer;
 import com.salesmanager.core.model.catalog.product.manufacturer.ManufacturerDescription;
 import com.salesmanager.core.model.catalog.product.variant.ProductVariant;
 import com.salesmanager.core.model.merchant.MerchantStore;
-
 import modules.commons.search.SearchModule;
 import modules.commons.search.configuration.SearchConfiguration;
-import modules.commons.search.request.Document;
-import modules.commons.search.request.IndexItem;
-import modules.commons.search.request.RequestOptions;
-import modules.commons.search.request.SearchRequest;
-import modules.commons.search.request.SearchResponse;
+import modules.commons.search.request.*;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("productSearchService")
 @EnableConfigurationProperties(value = ApplicationSearchConfiguration.class)
@@ -510,10 +495,7 @@ public class SearchServiceImpl implements com.salesmanager.core.business.service
 	
 	public String loadClassPathResource(String file) throws Exception {
 		Resource res = new ClassPathResource(file);
-		File f = res.getFile();
-		
-		return new String(
-			      Files.readAllBytes(f.toPath()));
+		return new String(res.getInputStream().readAllBytes());
 	}
 
 }
