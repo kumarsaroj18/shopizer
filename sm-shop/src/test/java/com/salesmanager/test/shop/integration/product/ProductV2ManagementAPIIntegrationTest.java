@@ -39,12 +39,14 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 	@Test
 	public void createProductWithCategory() throws Exception {
 
+		long timestamp = System.currentTimeMillis();
+		String categoryCode = "test-catv2-" + timestamp;
 
 		/**
 		 * Create a category for product association
 		 */
 		final PersistableCategory newCategory = new PersistableCategory();
-		newCategory.setCode("test-catv2");
+		newCategory.setCode(categoryCode);
 		newCategory.setSortOrder(1);
 		newCategory.setVisible(true);
 		newCategory.setDepth(4);
@@ -55,9 +57,9 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 
 		final CategoryDescription description = new CategoryDescription();
 		description.setLanguage("en");
-		description.setName("test-catv2");
-		description.setFriendlyUrl("test-catv2");
-		description.setTitle("test-catv2");
+		description.setName(categoryCode);
+		description.setFriendlyUrl(categoryCode);
+		description.setTitle(categoryCode);
 
 		final List<CategoryDescription> descriptions = new ArrayList<>();
 		descriptions.add(description);
@@ -72,7 +74,7 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 		assertTrue(categoryResponse.getStatusCode()== CREATED);
 		assertNotNull(cat.getId());
 
-		final PersistableProduct product = super.product("123");
+		final PersistableProduct product = super.product("123-" + timestamp);
 		final ArrayList<Category> categories = new ArrayList<>();
 		categories.add(cat);
 		product.setCategories(categories);
@@ -89,7 +91,7 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 		
 		//create options
 		PersistableProductOption color = new PersistableProductOption();
-		color.setCode("color");
+		color.setCode("color-" + timestamp);
 		ProductOptionDescription colorEn = new ProductOptionDescription();
 		colorEn.setName("Color");
 		colorEn.setLanguage("en");
@@ -103,7 +105,7 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 		
 		
 		PersistableProductOption size = new PersistableProductOption();
-		size.setCode("size");
+		size.setCode("size-" + timestamp);
 		ProductOptionDescription sizeEn = new ProductOptionDescription();
 		sizeEn.setName("Size");
 		sizeEn.setLanguage("en");
@@ -117,7 +119,7 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 		
 		//opions values
 		PersistableProductOptionValue white = new PersistableProductOptionValue();
-		white.setCode("white");
+		white.setCode("white-" + timestamp);
 		ProductOptionValueDescription whiteEn = new ProductOptionValueDescription();
 		whiteEn.setName("White");
 		whiteEn.setLanguage("en");
@@ -130,7 +132,7 @@ public class ProductV2ManagementAPIIntegrationTest extends ServicesTestSupport {
 		System.out.println(whiteResponse.getBody().getId());
 		
 		PersistableProductOptionValue medium = new PersistableProductOptionValue();
-		medium.setCode("medium");
+		medium.setCode("medium-" + timestamp);
 		ProductOptionValueDescription mediumEn = new ProductOptionValueDescription();
 		mediumEn.setName("Medium");
 		mediumEn.setLanguage("en");

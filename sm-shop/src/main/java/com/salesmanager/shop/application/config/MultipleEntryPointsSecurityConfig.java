@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import com.salesmanager.shop.admin.security.UserAuthenticationSuccessHandler;
 import com.salesmanager.shop.admin.security.WebUserServices;
@@ -70,6 +72,15 @@ public class MultipleEntryPointsSecurityConfig {
 	@Bean
 	public CustomerFacade customerFacade() {
 		return new com.salesmanager.shop.store.controller.customer.facade.CustomerFacadeImpl();
+	}
+	
+	@Bean
+	public HttpFirewall allowUrlEncodedSlashHttpFirewall() {
+		StrictHttpFirewall firewall = new StrictHttpFirewall();
+		firewall.setAllowUrlEncodedSlash(true);
+		firewall.setAllowSemicolon(true);
+		firewall.setAllowUrlEncodedDoubleSlash(true);
+		return firewall;
 	}
 
 	

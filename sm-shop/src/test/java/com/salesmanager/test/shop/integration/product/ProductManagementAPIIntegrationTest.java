@@ -59,9 +59,11 @@ public class ProductManagementAPIIntegrationTest extends ServicesTestSupport {
 	@Test
 	public void createProductWithCategory() throws Exception {
 
+		long timestamp = System.currentTimeMillis();
+		String categoryCode = "test-cat-" + timestamp;
 
 		final PersistableCategory newCategory = new PersistableCategory();
-		newCategory.setCode("test-cat");
+		newCategory.setCode(categoryCode);
 		newCategory.setSortOrder(1);
 		newCategory.setVisible(true);
 		newCategory.setDepth(4);
@@ -72,9 +74,9 @@ public class ProductManagementAPIIntegrationTest extends ServicesTestSupport {
 
 		final CategoryDescription description = new CategoryDescription();
 		description.setLanguage("en");
-		description.setName("test-cat");
-		description.setFriendlyUrl("test-cat");
-		description.setTitle("test-cat");
+		description.setName(categoryCode);
+		description.setFriendlyUrl(categoryCode);
+		description.setTitle(categoryCode);
 
 		final List<CategoryDescription> descriptions = new ArrayList<>();
 		descriptions.add(description);
@@ -89,7 +91,7 @@ public class ProductManagementAPIIntegrationTest extends ServicesTestSupport {
 		assertThat(categoryResponse.getStatusCode(), is(CREATED));
 		assertNotNull(cat.getId());
 
-		final PersistableProduct product = super.product("PRODUCT12");
+		final PersistableProduct product = super.product("PRODUCT12-" + timestamp);
 		final ArrayList<Category> categories = new ArrayList<>();
 		categories.add(cat);
 		product.setCategories(categories);
@@ -98,7 +100,7 @@ public class ProductManagementAPIIntegrationTest extends ServicesTestSupport {
 				com.salesmanager.core.model.catalog.product.manufacturer.Manufacturer.DEFAULT_MANUFACTURER);
 		product.setProductSpecifications(specifications);
 		product.setPrice(BigDecimal.TEN);
-		product.setSku("123ABC");
+		product.setSku("123ABC-" + timestamp);
 		final HttpEntity<PersistableProduct> entity = new HttpEntity<>(product, getHeader());
 
 		final ResponseEntity<PersistableProduct> response = testRestTemplate.postForEntity(

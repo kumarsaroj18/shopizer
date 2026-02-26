@@ -32,7 +32,7 @@ public class TaxRateIntegrationTest extends ServicesTestSupport {
     	
     	//create tax class
     	PersistableTaxClass taxClass = new PersistableTaxClass();
-    	taxClass.setCode("TESTTX");
+    	taxClass.setCode("TX" + (System.currentTimeMillis() % 100000));
     	taxClass.setName("Test tax class");
     	
         final HttpEntity<PersistableTaxClass> taxClassEntity = new HttpEntity<>(taxClass, getHeader());
@@ -69,7 +69,7 @@ public class TaxRateIntegrationTest extends ServicesTestSupport {
     	
     	//create tax class
     	PersistableTaxRate taxRate = new PersistableTaxRate();
-    	taxRate.setCode("taxcode1");
+    	taxRate.setCode("TR" + (System.currentTimeMillis() % 100000));
     	taxRate.setCountry("US");
     	taxRate.setPriority(0);
     	taxRate.setRate(new BigDecimal(5));

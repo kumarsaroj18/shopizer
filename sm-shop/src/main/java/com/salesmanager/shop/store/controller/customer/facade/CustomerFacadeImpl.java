@@ -1049,13 +1049,13 @@ public class CustomerFacadeImpl implements CustomerFacade {
     	  customer.getDelivery().setAddress(customer.getBilling().getAddress());
       }
       if(StringUtils.isBlank(customer.getDelivery().getCity())) {
-    	  customer.getDelivery().setAddress(customer.getBilling().getCity());
+    	  customer.getDelivery().setCity(customer.getBilling().getCity());
       }
       if(StringUtils.isBlank(customer.getDelivery().getPostalCode())) {
-    	  customer.getDelivery().setAddress(customer.getBilling().getPostalCode());
+    	  customer.getDelivery().setPostalCode(customer.getBilling().getPostalCode());
       }
       if(StringUtils.isBlank(customer.getDelivery().getCountryCode())) {
-    	  customer.getDelivery().setAddress(customer.getDelivery().getCountryCode());
+    	  customer.getDelivery().setCountryCode(customer.getBilling().getCountryCode());
       }
     }
     
@@ -1074,7 +1074,7 @@ public class CustomerFacadeImpl implements CustomerFacade {
       }
 
     } catch (Exception e) {
-      throw new ServiceRuntimeException("Error while updating customer address");
+      throw new ServiceRuntimeException("Error while updating customer address", e);
     }
     
 

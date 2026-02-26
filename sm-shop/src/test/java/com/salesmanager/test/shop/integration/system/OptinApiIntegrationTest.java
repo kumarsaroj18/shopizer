@@ -31,7 +31,7 @@ public class OptinApiIntegrationTest extends ServicesTestSupport {
   public void createOptin() throws Exception {
 
       PersistableOptin optin = new PersistableOptin();
-      optin.setCode(OptinType.PROMOTIONS.name());
+      optin.setCode(OptinType.PROMOTIONS.name() + "-" + System.currentTimeMillis());
       optin.setOptinType(OptinType.PROMOTIONS.name());
      
       

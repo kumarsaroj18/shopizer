@@ -71,8 +71,9 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
     @Test
     public void postCategory() throws Exception {
 
+        String uniqueCode = "javascript-" + System.currentTimeMillis();
         PersistableCategory newCategory = new PersistableCategory();
-        newCategory.setCode("javascript");
+        newCategory.setCode(uniqueCode);
         newCategory.setSortOrder(1);
         newCategory.setVisible(true);
         newCategory.setDepth(4);
@@ -84,7 +85,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
         CategoryDescription description = new CategoryDescription();
         description.setLanguage("en");
         description.setName("Javascript");
-        description.setFriendlyUrl("javascript");
+        description.setFriendlyUrl(uniqueCode);
         description.setTitle("Javascript");
 
         List<CategoryDescription> descriptions = new ArrayList<>();
@@ -178,22 +179,23 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
     @Test
     public void postComplexCategory() throws Exception {
 
+        long timestamp = System.currentTimeMillis();
         /** Dining room **/
         final PersistableCategory dining = new PersistableCategory();
-        dining.setCode("diningroom");
+        dining.setCode("diningroom-" + timestamp);
         dining.setSortOrder(0);
         dining.setVisible(true);
 
         CategoryDescription endescription = new CategoryDescription();
         endescription.setLanguage("en");
         endescription.setName("Dining room");
-        endescription.setFriendlyUrl("dining-room");
+        endescription.setFriendlyUrl("dining-room-" + timestamp);
         endescription.setTitle("Dining room");
 
         CategoryDescription frdescription = new CategoryDescription();
         frdescription.setLanguage("fr");
         frdescription.setName("Salle à manger");
-        frdescription.setFriendlyUrl("salle-a-manger");
+        frdescription.setFriendlyUrl("salle-a-manger-" + timestamp);
         frdescription.setTitle("Salle à manger");
 
         List<CategoryDescription> descriptions = new ArrayList<>();
@@ -207,7 +209,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
 
         /** armoire **/
         final PersistableCategory armoire = new PersistableCategory();
-        armoire.setCode("armoire");
+        armoire.setCode("armoire-" + timestamp);
         armoire.setSortOrder(1);
         armoire.setVisible(true);
 
@@ -216,13 +218,13 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
         endescription = new CategoryDescription();
         endescription.setLanguage("en");
         endescription.setName("Armoires");
-        endescription.setFriendlyUrl("armoires");
+        endescription.setFriendlyUrl("armoires-" + timestamp);
         endescription.setTitle("Armoires");
 
         frdescription = new CategoryDescription();
         frdescription.setLanguage("fr");
         frdescription.setName("Armoire");
-        frdescription.setFriendlyUrl("armoires");
+        frdescription.setFriendlyUrl("armoires-" + timestamp);
         frdescription.setTitle("Armoires");
 
         descriptions = new ArrayList<>();
@@ -234,7 +236,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
 
         /** benches **/
         final PersistableCategory bench = new PersistableCategory();
-        bench.setCode("bench");
+        bench.setCode("bench-" + timestamp);
         bench.setSortOrder(4);
         bench.setVisible(true);
 
@@ -243,13 +245,13 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
         endescription = new CategoryDescription();
         endescription.setLanguage("en");
         endescription.setName("Benches");
-        endescription.setFriendlyUrl("benches");
+        endescription.setFriendlyUrl("benches-" + timestamp);
         endescription.setTitle("Benches");
 
         frdescription = new CategoryDescription();
         frdescription.setLanguage("fr");
         frdescription.setName("Bancs");
-        frdescription.setFriendlyUrl("bancs");
+        frdescription.setFriendlyUrl("bancs-" + timestamp);
         frdescription.setTitle("Bancs");
 
         descriptions = new ArrayList<>();
@@ -261,20 +263,20 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
 
         /** Living room **/
         final PersistableCategory living = new PersistableCategory();
-        living.setCode("livingroom");
+        living.setCode("livingroom-" + timestamp);
         living.setSortOrder(2);
         living.setVisible(true);
 
         endescription = new CategoryDescription();
         endescription.setLanguage("en");
         endescription.setName("Living room");
-        endescription.setFriendlyUrl("living-room");
+        endescription.setFriendlyUrl("living-room-" + timestamp);
         endescription.setTitle("Living room");
 
         frdescription = new CategoryDescription();
         frdescription.setLanguage("fr");
         frdescription.setName("Salon");
-        frdescription.setFriendlyUrl("salon");
+        frdescription.setFriendlyUrl("salon-" + timestamp);
         frdescription.setTitle("Salon");
 
         descriptions = new ArrayList<>();
@@ -286,7 +288,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
         /** lounge **/
 
         final PersistableCategory lounge = new PersistableCategory();
-        lounge.setCode("lounge");
+        lounge.setCode("lounge-" + timestamp);
         lounge.setSortOrder(3);
         lounge.setVisible(true);
 
@@ -296,7 +298,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
         endescription = new CategoryDescription();
         endescription.setLanguage("en");
         endescription.setName("Lounge");
-        endescription.setFriendlyUrl("lounge");
+        endescription.setFriendlyUrl("lounge-" + timestamp);
         endescription.setTitle("Lounge");
 
         frdescription = new CategoryDescription();
@@ -346,7 +348,8 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
       ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
       
       //create first manufacturer
-      PersistableManufacturer m1 = super.manufacturer("BRAND1");   
+      String uniqueCode = "TEST-" + System.currentTimeMillis();
+      PersistableManufacturer m1 = super.manufacturer("BRAND1-" + System.currentTimeMillis());   
       
       String json = writer.writeValueAsString(m1);
       HttpEntity<String> entity = new HttpEntity<>(json, getHeader());
@@ -356,7 +359,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
       assertThat(response.getStatusCode(), is(CREATED));
 
       //create second manufacturer
-      PersistableManufacturer m2 = super.manufacturer("BRAND2");
+      PersistableManufacturer m2 = super.manufacturer("BRAND2-" + System.currentTimeMillis());
       json = writer.writeValueAsString(m2);
       entity = new HttpEntity<>(json, getHeader());
 
@@ -364,9 +367,9 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
       assertThat(response.getStatusCode(), is(CREATED));
       
       //create category
-      PersistableCategory category = super.category("TEST");
+      PersistableCategory category = super.category(uniqueCode);
       Category cat = new Category();//to be used in product
-      cat.setCode("TEST");
+      cat.setCode(uniqueCode);
       
       json = writer.writeValueAsString(category);
       entity = new HttpEntity<>(json, getHeader());

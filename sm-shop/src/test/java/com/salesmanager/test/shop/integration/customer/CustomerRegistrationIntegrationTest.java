@@ -28,9 +28,9 @@ public class CustomerRegistrationIntegrationTest extends ServicesTestSupport {
     @Test
     public void registerCustomer() {
         
-      
+        String uniqueEmail = "customer" + System.currentTimeMillis() + "@test.com";
         final PersistableCustomer testCustomer = new PersistableCustomer();
-        testCustomer.setEmailAddress("customer1@test.com");
+        testCustomer.setEmailAddress(uniqueEmail);
         testCustomer.setPassword("clear123");
         testCustomer.setGender(CustomerGender.M.name());
         testCustomer.setLanguage("en");
@@ -47,7 +47,7 @@ public class CustomerRegistrationIntegrationTest extends ServicesTestSupport {
 
         // created customer can login
 
-        final ResponseEntity<AuthenticationResponse> loginResponse = testRestTemplate.postForEntity("/api/v1/customer/login", new HttpEntity<>(new AuthenticationRequest("customer1@test.com", "clear123")),
+        final ResponseEntity<AuthenticationResponse> loginResponse = testRestTemplate.postForEntity("/api/v1/customer/login", new HttpEntity<>(new AuthenticationRequest(uniqueEmail, "clear123")),
                 AuthenticationResponse.class);
         assertThat(loginResponse.getStatusCode(), is(OK));
         assertNotNull(loginResponse.getBody().getToken());

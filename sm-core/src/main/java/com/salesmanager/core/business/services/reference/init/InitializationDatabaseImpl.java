@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.salesmanager.core.business.exception.ServiceException;
 import com.salesmanager.core.business.services.catalog.product.manufacturer.ManufacturerService;
 import com.salesmanager.core.business.services.catalog.product.type.ProductTypeService;
+import com.salesmanager.core.business.services.content.ContentService;
 import com.salesmanager.core.business.services.merchant.MerchantStoreService;
 import com.salesmanager.core.business.services.reference.country.CountryService;
 import com.salesmanager.core.business.services.reference.currency.CurrencyService;
@@ -31,6 +32,9 @@ import com.salesmanager.core.constants.SchemaConstant;
 import com.salesmanager.core.model.catalog.product.manufacturer.Manufacturer;
 import com.salesmanager.core.model.catalog.product.manufacturer.ManufacturerDescription;
 import com.salesmanager.core.model.catalog.product.type.ProductType;
+import com.salesmanager.core.model.content.Content;
+import com.salesmanager.core.model.content.ContentDescription;
+import com.salesmanager.core.model.content.ContentType;
 import com.salesmanager.core.model.merchant.MerchantStore;
 import com.salesmanager.core.model.reference.country.Country;
 import com.salesmanager.core.model.reference.country.CountryDescription;
@@ -93,6 +97,9 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 	
 	@Inject
 	protected PermissionService   permissionService;
+	
+	@Inject
+	private ContentService contentService;
 
 	private String name;
 	
@@ -112,7 +119,7 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 		createSubReferences();
 		createModules();
 		createMerchant();
-
+		createDefaultContent();
 
 	}
 	
@@ -466,6 +473,28 @@ public class InitializationDatabaseImpl implements InitializationDatabase {
 
 		
 		
+	}
+	
+	private void createDefaultContent() throws ServiceException {
+		LOGGER.info(String.format("%s : Creating default content boxes", name));
+		
+		MerchantStore store = merchantService.getByCode(MerchantStore.DEFAULT_STORE);
+		Language en = languageService.getByCode("en");
+		
+		Content headerMessage = new Content();
+		headerMessage.setCode("headerMessage");
+		headerMessage.setMerchantStore(store);
+		headerMessage.setContentType(ContentType.BOX);
+		headerMessage.setVisible(true);
+		
+		ContentDescription headerDesc = new ContentDescription();
+		headerDesc.setLanguage(en);
+		headerDesc.setName("Header Message");
+		headerDesc.setDescription("Welcome to our store");
+		headerDesc.setContent(headerMessage);
+		
+		headerMessage.getDescriptions().add(headerDesc);
+		contentService.create(headerMessage);
 	}
 	
 

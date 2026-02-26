@@ -115,6 +115,9 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
 	@OneToMany(mappedBy = "customer", targetEntity = ProductReview.class)
 	private List<ProductReview> reviews = new ArrayList<ProductReview>();
 	
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CustomerAddress> addresses = new ArrayList<CustomerAddress>();
+	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="MERCHANT_ID", nullable=false)
@@ -353,6 +356,14 @@ public class Customer extends SalesManagerEntity<Long, Customer> implements Audi
 
 	public void setCredentialsResetRequest(CredentialsReset credentialsResetRequest) {
 		this.credentialsResetRequest = credentialsResetRequest;
+	}
+
+	public List<CustomerAddress> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<CustomerAddress> addresses) {
+		this.addresses = addresses;
 	}
 	
 }

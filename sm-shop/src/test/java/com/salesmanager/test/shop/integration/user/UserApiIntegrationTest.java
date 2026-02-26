@@ -47,12 +47,13 @@ public class UserApiIntegrationTest extends ServicesTestSupport {
   @Test
   public void createUserChangePassword() throws Exception {
  
+      String uniqueEmail = "test" + System.currentTimeMillis() + "@test.com";
       PersistableUser newUser = new PersistableUser();
       newUser.setDefaultLanguage("en");
-      newUser.setEmailAddress("test@test.com");
+      newUser.setEmailAddress(uniqueEmail);
       newUser.setFirstName("Test");
       newUser.setLastName("User");
-      newUser.setUserName("test@test.com");
+      newUser.setUserName(uniqueEmail);
       newUser.setPassword(CREATED_PASSWORD);
       newUser.setRepeatPassword(CREATED_PASSWORD);
       

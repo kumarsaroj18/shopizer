@@ -61,7 +61,7 @@ public class MerchantStoreApiIntegrationTest extends ServicesTestSupport {
   @Test
   public void testCreateStore() throws Exception {
       
-      
+      String uniqueStoreCode = "test-" + System.currentTimeMillis();
       PersistableAddress address = new PersistableAddress();
       address.setAddress("121212 simple address");
       address.setPostalCode("12345");
@@ -70,11 +70,11 @@ public class MerchantStoreApiIntegrationTest extends ServicesTestSupport {
       address.setStateProvince("FL");
 
       PersistableMerchantStore createdStore = new PersistableMerchantStore();
-      createdStore.setCode(TEST_STORE_CODE);
+      createdStore.setCode(uniqueStoreCode);
       createdStore.setCurrency(CURRENCY);
       createdStore.setDefaultLanguage(DEFAULT_LANGUAGE);
       createdStore.setEmail("test@test.com");
-      createdStore.setName(TEST_STORE_CODE);
+      createdStore.setName(uniqueStoreCode);
       createdStore.setPhone("444-555-6666");
       createdStore.setSupportedLanguages(Arrays.asList(DEFAULT_LANGUAGE));
       createdStore.setAddress(address);

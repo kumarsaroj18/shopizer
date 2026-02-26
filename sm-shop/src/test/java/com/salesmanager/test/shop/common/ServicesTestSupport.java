@@ -16,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.salesmanager.core.business.constants.Constants;
 import com.salesmanager.shop.application.ShopApplication;
@@ -46,6 +48,7 @@ import com.salesmanager.shop.store.security.AuthenticationResponse;
 
 @SpringBootTest(classes = ShopApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
+@Transactional
 public class ServicesTestSupport {
 
 	@Autowired
@@ -168,8 +171,10 @@ public class ServicesTestSupport {
 
 	protected ReadableProduct sampleProduct(String code) {
 
+		String uniqueCode = code + "-" + System.currentTimeMillis();
+
 		final PersistableCategory newCategory = new PersistableCategory();
-		newCategory.setCode(code);
+		newCategory.setCode(uniqueCode);
 		newCategory.setSortOrder(1);
 		newCategory.setVisible(true);
 		newCategory.setDepth(4);
@@ -180,9 +185,9 @@ public class ServicesTestSupport {
 
 		final CategoryDescription description = new CategoryDescription();
 		description.setLanguage("en");
-		description.setName("test-cat");
-		description.setFriendlyUrl("test-cat");
-		description.setTitle("test-cat");
+		description.setName(uniqueCode);
+		description.setFriendlyUrl(uniqueCode);
+		description.setTitle(uniqueCode);
 
 		final List<CategoryDescription> descriptions = new ArrayList<>();
 		descriptions.add(description);
@@ -197,7 +202,7 @@ public class ServicesTestSupport {
 		assertThat(categoryResponse.getStatusCode(), is(CREATED));
 		assertNotNull(cat.getId());
 
-		final PersistableProduct product = this.product(code);
+		final PersistableProduct product = this.product(uniqueCode);
 		final ArrayList<Category> categories = new ArrayList<>();
 		categories.add(cat);
 		product.setCategories(categories);
@@ -207,7 +212,7 @@ public class ServicesTestSupport {
 		product.setProductSpecifications(specifications);
 		product.setAvailable(true);
 		product.setPrice(BigDecimal.TEN);
-		product.setSku(code);
+		product.setSku(uniqueCode);
 		product.setQuantity(100);
 		/**
 		ProductDescription productDescription = new ProductDescription();
@@ -225,7 +230,7 @@ public class ServicesTestSupport {
 
 		final HttpEntity<String> httpEntity = new HttpEntity<>(getHeader());
 
-		String apiUrl = "/api/v2/product/" + code;
+		String apiUrl = "/api/v2/product/" + uniqueCode;
 
 		ResponseEntity<ReadableProduct> readableProduct = testRestTemplate.exchange(apiUrl, HttpMethod.GET, httpEntity,
 				ReadableProduct.class);
@@ -236,7 +241,7 @@ public class ServicesTestSupport {
 
 	protected ReadableShoppingCart sampleCart() {
 
-		ReadableProduct product = sampleProduct("sampleCart");
+		ReadableProduct product = sampleProduct("sampleCart-" + System.currentTimeMillis());
 		assertNotNull(product);
 
 		PersistableShoppingCartItem cartItem = new PersistableShoppingCartItem();
