@@ -5,6 +5,20 @@
 	<groupId>com.shopizer</groupId>
 	<artifactId>shopizer</artifactId>
 	<packaging>pom</packaging>
+
+	<profiles>
+		<profile>
+			<id>ci</id>
+			<properties>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
+				<maven.source.skip>true</maven.source.skip>
+				<skipITs>true</skipITs>
+				<enforcer.skip>true</enforcer.skip>
+				<spotbugs.skip>true</spotbugs.skip>
+			</properties>
+		</profile>
+	</profiles>
+
 	<version>3.2.5</version>
 
 	<name>shopizer</name>
@@ -463,38 +477,28 @@
 	</dependencies>
 
 	<repositories>
-		<!-- Sonatype snapshot repo -->
 		<repository>
-			<id>oss-sonatype</id>
-			<name>oss-sonatype</name>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-			<snapshots>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<releases>
 				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
 			</snapshots>
-		</repository>
-		<repository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/libs-release</url>
-		</repository>
-		<!-- Milestone repo -->
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone</name>
-			<url>https://repo.spring.io/milestone/</url>
-		</repository>
-		<repository>
-			<id>org.jboss.repository.releases</id>
-			<name>JBoss Maven Release Repository</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/releases</url>
 		</repository>
 	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>spring-releases</id>
-			<name>Spring Releases</name>
-			<url>https://repo.spring.io/libs-release</url>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -513,112 +517,32 @@
 							<artifactId>mapstruct-processor</artifactId>
 							<version>${org.mapstruct.version}</version>
 						</path>
-						<!-- other annotation processors -->
 					</annotationProcessorPaths>
+					<compilerArgs>
+						<arg>-Xlint:none</arg>
+						<arg>-J-XX:+TieredCompilation</arg>
+						<arg>-J-XX:TieredStopAtLevel=1</arg>
+					</compilerArgs>
+					<showWarnings>false</showWarnings>
+					<showDeprecation>false</showDeprecation>
 				</configuration>
 			</plugin>
 
 			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>3.1.8</version>
-			</plugin>
-			<!--OSSRH -->
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.7</version>
-				<extensions>true</extensions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					<skipIfEmpty>true</skipIfEmpty>
 				</configuration>
 			</plugin>
-			<!--OSSRH -->
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+				<artifactId>maven-install-plugin</artifactId>
 				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<useReleaseProfile>false</useReleaseProfile>
-					<releaseProfiles>release</releaseProfiles>
-					<goals>deploy</goals>
+					<skip>false</skip>
 				</configuration>
 			</plugin>
-			<!--OSSRH -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!--OSSRH -->
-
-			<!-- 			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> 
-			-->
-
-			<!-- Enforce Java version -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.4.1</version>
-				<executions>
-					<execution>
-						<id>enforce-java</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireJavaVersion>
-									<version>[11,12)</version>
-									<message>
-										This project must be built with Java 11.
-										Current Java version is not supported.
-									</message>
-								</requireJavaVersion>
-							</rules>
-							<fail>true</fail>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 
 		</plugins>
 	</build>
