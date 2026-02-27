@@ -94,9 +94,8 @@ public class SearchServiceImpl implements com.salesmanager.core.business.service
 		 */
 
 		if (searchModule != null && !noIndex) {
-
-			SearchConfiguration searchConfiguration = config();
 			try {
+				SearchConfiguration searchConfiguration = config();
 				searchModule.configure(searchConfiguration);
 			} catch (Exception e) {
 				LOGGER.error("SearchModule cannot be configured [" + e.getMessage() + "]", e);

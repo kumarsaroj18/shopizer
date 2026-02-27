@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -37,6 +38,7 @@ import com.salesmanager.core.model.merchant.MerchantStore;
  *
  */
 @Component
+@ConditionalOnProperty(name = "search.noindex", havingValue = "false", matchIfMissing = true)
 public class IndexProductEventListener implements ApplicationListener<ProductEvent> {
 
 	@Autowired

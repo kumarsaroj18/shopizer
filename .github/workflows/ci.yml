@@ -21,27 +21,12 @@ env:
 
 jobs:
   # ─────────────────────────────────────────────────────────────────────────────
-  # Job 1: Run all tests against a real MySQL service container
+  # Job 1: Run tests
   # ─────────────────────────────────────────────────────────────────────────────
   test:
     name: Test
     runs-on: ubuntu-latest
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: SALESMANAGER
-          MYSQL_USER: app_user
-          MYSQL_PASSWORD: app_password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root --password=root"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout source
@@ -62,20 +47,13 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Run tests
-        run: |
-          ./mvnw test \
-            -Dspring.profiles.active=mysql \
-            -Dspring.datasource.url=jdbc:mysql://127.0.0.1:3306/SALESMANAGER?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC \
-            -Dspring.datasource.username=app_user \
-            -Dspring.datasource.password=app_password \
-            --batch-mode \
-            --no-transfer-progress
+        run: ./mvnw test --batch-mode
 
-      - name: Upload Surefire test reports
+      - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: surefire-reports
+          name: test-reports
           path: '**/target/surefire-reports/**'
           retention-days: 7
 
@@ -111,10 +89,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build fat JAR (skip tests)
-        run: |
-          ./mvnw package -DskipTests -pl sm-shop -am \
-            --batch-mode \
-            --no-transfer-progress
+        run: ./mvnw package -DskipTests -pl sm-shop -am --batch-mode
 
       - name: Upload shopizer.jar as workflow artifact
         uses: actions/upload-artifact@v4
