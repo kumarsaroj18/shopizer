@@ -38,12 +38,12 @@ import com.salesmanager.shop.utils.ImageFilePath;
 import com.salesmanager.shop.utils.LocaleUtils;
 
 @Service("productFacade")
-@Profile({ "default", "cloud", "gcp", "aws", "mysql" , "local" })
+@Profile({ "default", "cloud", "gcp", "aws", "mysql", "local", "test" })
 public class ProductFacadeImpl implements ProductFacade {
 
 	@Inject
 	private CategoryService categoryService;
-	
+
 	@Inject
 	private ProductAttributeService productAttributeService;
 
@@ -55,7 +55,6 @@ public class ProductFacadeImpl implements ProductFacade {
 
 	@Inject
 	private ProductRelationshipService productRelationshipService;
-
 
 	@Inject
 	@Qualifier("img")
@@ -124,14 +123,15 @@ public class ProductFacadeImpl implements ProductFacade {
 			}
 		}
 
-		
-		Page<Product> modelProductList = productService.listByStore(store, language, criterias, criterias.getStartPage(), criterias.getMaxCount());
-		
+		Page<Product> modelProductList = productService.listByStore(store, language, criterias,
+				criterias.getStartPage(), criterias.getMaxCount());
+
 		List<Product> products = modelProductList.getContent();
-		
-		List<Product> prds = products.stream().sorted(Comparator.comparing(Product::getSortOrder)).collect(Collectors.toList());
+
+		List<Product> prds = products.stream().sorted(Comparator.comparing(Product::getSortOrder))
+				.collect(Collectors.toList());
 		products = prds;
-		
+
 		ReadableProductPopulator populator = new ReadableProductPopulator();
 		populator.setPricingService(pricingService);
 		populator.setimageUtils(imageUtils);
@@ -153,7 +153,7 @@ public class ProductFacadeImpl implements ProductFacade {
 
 		return productList;
 	}
-	
+
 	@Override
 	public ReadableProduct getProductByCode(MerchantStore store, String uniqueCode, Language language) {
 
@@ -201,10 +201,9 @@ public class ProductFacadeImpl implements ProductFacade {
 		return null;
 	}
 
-
-
 	@Override
-	public ReadableProduct getProductBySeUrl(MerchantStore store, String friendlyUrl, Language language) throws Exception {
+	public ReadableProduct getProductBySeUrl(MerchantStore store, String friendlyUrl, Language language)
+			throws Exception {
 
 		Product product = productService.getBySeUrl(store, friendlyUrl, LocaleUtils.getLocale(language));
 
@@ -224,50 +223,58 @@ public class ProductFacadeImpl implements ProductFacade {
 	}
 
 	/**
-	@Override
-	public ReadableProductPrice getProductPrice(Long id, ProductPriceRequest priceRequest, MerchantStore store, Language language) {
-		Validate.notNull(id, "Product id cannot be null");
-		Validate.notNull(priceRequest, "Product price request cannot be null");
-		Validate.notNull(store, "MerchantStore cannot be null");
-		Validate.notNull(language, "Language cannot be null");
-		
-		try {
-			Product model = productService.findOne(id, store);
-			
-			//TODO check if null
-			List<Long> attrinutesIds = priceRequest.getOptions().stream().map(p -> p.getId()).collect(Collectors.toList());
-			
-			List<ProductAttribute> attributes = productAttributeService.getByAttributeIds(store, model, attrinutesIds);      
-			
-			for(ProductAttribute attribute : attributes) {
-				if(attribute.getProduct().getId().longValue()!= id.longValue()) {
-					//throw unauthorized
-					throw new OperationNotAllowedException("Attribute with id [" + attribute.getId() + "] is not attached to product id [" + id + "]");
-				}
-			}
-			
-			FinalPrice price;
-		
-			price = pricingService.calculateProductPrice(model, attributes);
-	    	ReadableProductPrice readablePrice = new ReadableProductPrice();
-	    	ReadableFinalPricePopulator populator = new ReadableFinalPricePopulator();
-	    	populator.setPricingService(pricingService);
-	    	
-	    	
-	    	return populator.populate(price, readablePrice, store, language);
-    	
-		} catch (Exception e) {
-			throw new ServiceRuntimeException("An error occured while getting product price",e);
-		}
-
-	}
-	**/
+	 * @Override
+	 *           public ReadableProductPrice getProductPrice(Long id,
+	 *           ProductPriceRequest priceRequest, MerchantStore store, Language
+	 *           language) {
+	 *           Validate.notNull(id, "Product id cannot be null");
+	 *           Validate.notNull(priceRequest, "Product price request cannot be
+	 *           null");
+	 *           Validate.notNull(store, "MerchantStore cannot be null");
+	 *           Validate.notNull(language, "Language cannot be null");
+	 * 
+	 *           try {
+	 *           Product model = productService.findOne(id, store);
+	 * 
+	 *           //TODO check if null
+	 *           List<Long> attrinutesIds = priceRequest.getOptions().stream().map(p
+	 *           -> p.getId()).collect(Collectors.toList());
+	 * 
+	 *           List<ProductAttribute> attributes =
+	 *           productAttributeService.getByAttributeIds(store, model,
+	 *           attrinutesIds);
+	 * 
+	 *           for(ProductAttribute attribute : attributes) {
+	 *           if(attribute.getProduct().getId().longValue()!= id.longValue()) {
+	 *           //throw unauthorized
+	 *           throw new OperationNotAllowedException("Attribute with id [" +
+	 *           attribute.getId() + "] is not attached to product id [" + id +
+	 *           "]");
+	 *           }
+	 *           }
+	 * 
+	 *           FinalPrice price;
+	 * 
+	 *           price = pricingService.calculateProductPrice(model, attributes);
+	 *           ReadableProductPrice readablePrice = new ReadableProductPrice();
+	 *           ReadableFinalPricePopulator populator = new
+	 *           ReadableFinalPricePopulator();
+	 *           populator.setPricingService(pricingService);
+	 * 
+	 * 
+	 *           return populator.populate(price, readablePrice, store, language);
+	 * 
+	 *           } catch (Exception e) {
+	 *           throw new ServiceRuntimeException("An error occured while getting
+	 *           product price",e);
+	 *           }
+	 * 
+	 *           }
+	 **/
 
 	@Override
 	public Product getProduct(Long id, MerchantStore store) {
 		return productService.findOne(id, store);
 	}
-
-
 
 }

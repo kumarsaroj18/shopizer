@@ -25,21 +25,18 @@ import com.salesmanager.shop.store.controller.product.facade.ProductVariantFacad
 import com.salesmanager.shop.utils.ImageFilePath;
 
 @Service("productDefinitionFacade")
-@Profile({ "default", "cloud", "gcp", "aws", "mysql", "local" })
+@Profile({ "default", "cloud", "gcp", "aws", "mysql", "local", "test" })
 public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
-	
-
 
 	@Inject
 	private ProductService productService;
 
-
 	@Autowired
 	private PersistableProductDefinitionMapper persistableProductDefinitionMapper;
-	
+
 	@Autowired
 	private ReadableProductDefinitionMapper readableProductDefinitionMapper;
-	
+
 	@Autowired
 	private ProductVariantFacade productVariantFacade;
 
@@ -49,13 +46,13 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
 	@Override
 	public Long saveProductDefinition(MerchantStore store, PersistableProductDefinition product, Language language) {
-		
 
 		Product target = null;
 		if (product.getId() != null && product.getId().longValue() > 0) {
 			Optional<Product> p = productService.retrieveById(product.getId(), store);
-			if(p.isEmpty()) {
-				throw new ResourceNotFoundException("Product with id [" + product.getId() + "] not found for store [" + store.getCode() + "]");
+			if (p.isEmpty()) {
+				throw new ResourceNotFoundException(
+						"Product with id [" + product.getId() + "] not found for store [" + store.getCode() + "]");
 			}
 			target = p.get();
 		} else {
@@ -64,16 +61,15 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
 		try {
 			target = persistableProductDefinitionMapper.merge(product, target, store, language);
-				
+
 			productService.saveProduct(target);
 			product.setId(target.getId());
-
 
 			return target.getId();
 		} catch (Exception e) {
 			throw new ServiceRuntimeException(e);
 		}
-		
+
 	}
 
 	@Override
@@ -91,7 +87,7 @@ public class ProductDefinitionFacadeImpl implements ProductDefinitionFacade {
 
 	@Override
 	public ReadableProductDefinition getProductBySku(MerchantStore store, String uniqueCode, Language language) {
-		
+
 		Product product = null;
 		try {
 			product = productService.getBySku(uniqueCode, store, language);
