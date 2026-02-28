@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Shopizer-Backend-CI
 
 on:
   push:
@@ -19,10 +19,10 @@ env:
   MAVEN_OPTS: -Xmx2048m -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 jobs:
-  build:
-    name: Build & Test
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Cache local Maven repository
+      - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
@@ -43,20 +43,11 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Build and test
-        run: ./mvnw package -Pci -T 2C -B -s .mvn/settings.xml
+      - name: Build modules and resolve dependencies
+        run: ./mvnw clean install -DskipTests -T 2C -B -s .mvn/settings.xml
 
-      - name: Extract version
-        id: version
-        run: echo "version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout -pl sm-shop)" >> $GITHUB_OUTPUT
-
-      - name: Upload JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: shopizer-${{ steps.version.outputs.version }}-${{ github.sha }}
-          path: sm-shop/target/shopizer.jar
-          retention-days: 90
-          compression-level: 0
+      - name: Run tests
+        run: ./mvnw test -Pci -T 2C -B -s .mvn/settings.xml
 
       - name: Upload test reports
         if: failure()
@@ -65,3 +56,57 @@ jobs:
           name: test-reports-${{ github.sha }}
           path: '**/target/surefire-reports/**'
           retention-days: 7
+
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test
+    if: success()
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Restore Maven dependencies from cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Build package
+        run: ./mvnw package -Pci -DskipTests -T 2C -B -s .mvn/settings.xml
+
+      - name: Extract version
+        id: version
+        run: echo "version=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout -pl sm-shop -s .mvn/settings.xml)" >> $GITHUB_OUTPUT
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shopizer-${{ steps.version.outputs.version }}-${{ github.sha }}
+          path: sm-shop/target/shopizer.jar
+          retention-days: 90
+          compression-level: 0
+
+      - name: Upload build summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-info-${{ github.sha }}
+          path: |
+            **/target/classes/**
+            sm-core/target/sm-core.jar
+            sm-core-model/target/sm-core-model.jar
+            sm-core-modules/target/sm-core-modules.jar
+            sm-shop-model/target/sm-shop-model.jar
+          retention-days: 30
