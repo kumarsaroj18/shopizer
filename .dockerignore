@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+.github
+
+# Maven build output (keep sm-shop/target/shopizer.jar)
+sm-core/target
+sm-core-model/target
+sm-core-modules/target
+sm-shop-model/target
+sm-shop/target/classes
+sm-shop/target/generated-sources
+sm-shop/target/generated-test-sources
+sm-shop/target/maven-archiver
+sm-shop/target/maven-status
+sm-shop/target/surefire-reports
+sm-shop/target/test-classes
+sm-shop/target/shopizer.jar.original
+
+# Source code (not needed at runtime)
+*/src
+sm-shop/src
+
+# Maven wrapper (not needed in image)
+.mvn
+mvnw
+mvnw.cmd
+sm-core/mvnw
+sm-core/mvnw.cmd
+sm-core-model/mvnw
+sm-core-model/mvnw.cmd
+sm-core-modules/mvnw
+sm-core-modules/mvnw.cmd
+sm-shop-model/mvnw
+sm-shop-model/mvnw.cmd
+sm-shop/mvnw
+sm-shop/mvnw.cmd
+
+# Documentation
+*.md
+LICENSE.md
+
+# IDE files
+.idea
+*.iml
+.settings
+.classpath
+.project
+.factorypath
+*.swp
+
+# Docker files (avoid recursion)
+Dockerfile*
+.dockerignore
+build-image-from-ci.sh
+
+# .ci-download is intentionally NOT excluded here.
+# Dockerfile.ci needs to COPY .ci-download/shopizer.jar into the image.
+# The directory is cleaned up by build-image-from-ci.sh after the build.
+
+# Logs and temp files
+*.log
+*.tmp
+wget-log

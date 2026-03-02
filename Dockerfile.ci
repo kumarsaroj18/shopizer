@@ -1,0 +1,21 @@
+# Dockerfile for CI artifact-based image
+# The JAR is downloaded from GitHub Actions by build-image-from-ci.sh
+# before this Dockerfile is invoked. Do not run this directly.
+#
+# Usage: ./build-image-from-ci.sh <github-owner> <repo> <branch> <image-tag>
+
+FROM eclipse-temurin:11-jre
+
+RUN mkdir -p /opt/app
+RUN mkdir -p /files
+
+# JAR is downloaded locally by build-image-from-ci.sh into .ci-download/
+COPY .ci-download/shopizer.jar /opt/app/
+COPY sm-shop/SALESMANAGER.h2.db /
+COPY sm-shop/files /files
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD java -version || exit 1
+
+CMD ["java", "-jar", "/opt/app/shopizer.jar"]

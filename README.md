@@ -133,10 +133,36 @@ Before pushing, enable write access for `GITHUB_TOKEN` so it can push Docker ima
 Navigate to the **Actions** tab on your GitHub repository to see live pipeline runs, test logs, and downloadable artifacts.
 
 
-Running Locally from CI Artifacts:
+Full-Stack Docker Compose:
 -------------------
 
-The [`run-local.sh`](run-local.sh) script lets you pull the latest CI-built artifact and run Shopizer on your machine without building from source.
+The `docker-compose.yml` file has been moved to the **`shopizer-infra`** repository, where it now orchestrates the complete stack: MySQL, the Spring Boot backend, the Angular admin UI, and the React storefront.
+
+Quick-start:
+
+```bash
+# 1. Build all three images (from each repo's root)
+cd ../shopizer              && ./build-image-from-ci.sh <owner> shopizer
+cd ../shopizer-admin        && ./build-image-from-ci.sh <owner> shopizer-admin
+cd ../shopizer-shop-reactjs && ./build-image-from-ci.sh <owner> shopizer-shop-reactjs
+
+# 2. Start all services
+cd ../shopizer-infra && docker compose up -d
+```
+
+| Service | URL |
+|---|---|
+| Backend API / Swagger | http://localhost:8080/swagger-ui.html |
+| Admin UI | http://localhost:4200 |
+| React Shop | http://localhost:3000 |
+
+See [`shopizer-infra/README.md`](../shopizer-infra/README.md) § "Quick-Start (Local Dev Compose)" for full details and environment variable reference.
+
+
+Running Locally from CI Artifacts (backend only):
+-------------------
+
+The [`run-local.sh`](run-local.sh) script lets you pull the latest CI-built artifact and run **the Shopizer backend** on your machine without building from source. For the full stack (backend + admin + shop), see the `shopizer-infra` compose file above.
 
 #### Prerequisites
 
@@ -222,7 +248,27 @@ This will:
 
 > The application may take 30–60 seconds to fully initialize on first boot.
 
-Press **Ctrl+C** to stop — the script will automatically clean up all containers.
+#### Stopping the services
+
+You can stop the running services in two ways:
+
+**Option 1: Press Ctrl+C** in the terminal where `run-local.sh` is running
+- The script will automatically clean up all Docker containers and Java processes
+
+**Option 2: Use the `stop-local.sh` script** (useful when services are running in the background)
+
+```bash
+# Stop MySQL and Shopizer services normally
+./stop-local.sh
+
+# Force kill if processes or containers are stuck
+./stop-local.sh --force
+```
+
+The `stop-local.sh` script will:
+- Stop and remove Docker containers (`shopizer-mysql`, `shopizer-app`)
+- Kill any lingering Java processes (from jar or local modes)
+- Optionally force-kill processes on ports 8080 and 3306 with `--force` flag
 
 
 ### Access the application:

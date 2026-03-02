@@ -1,11 +1,0 @@
---2026-02-25 17:04:55--  https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.4.2/maven-wrapper-0.4.2.jar
-Resolving repo.maven.apache.org (repo.maven.apache.org)... 104.18.18.12, 104.18.19.12
-Connecting to repo.maven.apache.org (repo.maven.apache.org)|104.18.18.12|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 48337 (47K) [application/java-archive]
-Saving to: ‘/Users/saroj/workspace/github-personal/shopizer/.mvn/wrapper/maven-wrapper.jar’
-
-          /Users/sa   0%[                    ]       0  --.-KB/s               /Users/saroj/worksp 100%[===================>]  47.20K  --.-KB/s    in 0.001s  
-
-2026-02-25 17:04:55 (47.5 MB/s) - ‘/Users/saroj/workspace/github-personal/shopizer/.mvn/wrapper/maven-wrapper.jar’ saved [48337/48337]
-

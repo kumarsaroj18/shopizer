@@ -8,6 +8,36 @@
 #   - Multiple brands / manufacturers (per store)
 #   - Multiple products (per store, linked to category & brand)
 # ============================================================
+# Usage:
+#   ./populate-db.sh [OPTIONS]
+#
+# Options:
+#   --help, -h    Show this help message
+#
+# Environment Variables:
+#   BASE_URL      Backend API endpoint (default: http://localhost:8080)
+#   ADMIN_USER    Admin username (default: admin@shopizer.com)
+#   ADMIN_PASS    Admin password (default: password)
+#   FORCE_SUFFIX  Add suffix to codes for re-runs (default: empty)
+#
+# Examples:
+#   ./populate-db.sh
+#   BASE_URL=http://api.example.com ./populate-db.sh
+#   FORCE_SUFFIX=2 ./populate-db.sh
+# ============================================================
+
+usage() {
+  sed -n '/^# Usage/,/^# ====/p' "$0" | grep -v '^# ====' | sed 's/^# //'
+  exit 0
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --help|-h) usage ;;
+    *) echo "Unknown option: $1"; usage ;;
+  esac
+done
 
 BASE_URL="${BASE_URL:-http://localhost:8080}"
 ADMIN_USER="${ADMIN_USER:-admin@shopizer.com}"

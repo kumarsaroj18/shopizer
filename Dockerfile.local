@@ -1,0 +1,21 @@
+# Dockerfile for local development
+# Prerequisites: Build the project first from this directory:
+#   ./mvnw clean install -DskipTests
+#
+# Then build this image from the shopizer root directory:
+#   docker build -f Dockerfile.local -t shopizer:local .
+
+FROM eclipse-temurin:11-jre
+
+RUN mkdir -p /opt/app
+RUN mkdir -p /files
+
+COPY sm-shop/target/shopizer.jar /opt/app/
+COPY sm-shop/SALESMANAGER.h2.db /
+COPY sm-shop/files /files
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD java -version || exit 1
+
+CMD ["java", "-jar", "/opt/app/shopizer.jar"]

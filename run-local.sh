@@ -286,7 +286,7 @@ run_local_mode() {
 
   info "Building fat JAR (skipping tests)..."
   (cd "$SCRIPT_DIR" && ./mvnw package -DskipTests -pl sm-shop -am \
-    --batch-mode --no-transfer-progress)
+    --batch-mode)
 
   JAR_PATH="$SCRIPT_DIR/sm-shop/target/shopizer.jar"
   if [[ ! -f "$JAR_PATH" ]]; then
@@ -324,6 +324,10 @@ print_startup_info() {
   echo -e "  📋  Swagger UI      : ${BLUE}http://localhost:${APP_PORT}/swagger-ui.html${NC}"
   echo -e "  ❤️   Health Check    : ${BLUE}http://localhost:${APP_PORT}/actuator/health${NC}"
   echo -e "  🗄️   MySQL Port      : ${BLUE}localhost:${MYSQL_PORT}${NC}  (db: ${MYSQL_DB})"
+  echo ""
+  echo -e "  🔑  Admin Login (auto-created on first startup):"
+  echo -e "      Username: ${YELLOW}admin@shopizer.com${NC}"
+  echo -e "      Password: ${YELLOW}password${NC}"
   echo ""
   echo -e "  ℹ️   The app may take 30–60 seconds to fully initialize."
   echo ""

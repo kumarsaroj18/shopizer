@@ -1,23 +1,20 @@
-version: '3.8'
-
-services:
-  mysql:
-    image: mysql:8.0
-    container_name: springboot-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: SALESMANAGER
-      MYSQL_USER: app_user
-      MYSQL_PASSWORD: app_password
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    command: >
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_unicode_ci
-      --default-authentication-plugin=mysql_native_password
-
-volumes:
-  mysql_data:
+# ─────────────────────────────────────────────────────────────────────────────
+# MOVED
+#
+# The docker-compose.yml for the full Shopizer stack (backend + admin UI +
+# React shop + MySQL) has been moved to the shopizer-infra repository:
+#
+#   shopizer-infra/docker-compose.yml
+#
+# To run the full stack locally:
+#
+#   1. Build each image (from your local repo roots):
+#        cd ../shopizer              && ./build-image-from-ci.sh <owner> shopizer
+#        cd ../shopizer-admin        && ./build-image-from-ci.sh <owner> shopizer-admin
+#        cd ../shopizer-shop-reactjs && ./build-image-from-ci.sh <owner> shopizer-shop-reactjs
+#
+#   2. Start all services:
+#        cd ../shopizer-infra && docker compose up -d
+#
+# See shopizer-infra/README.md for full documentation.
+# ─────────────────────────────────────────────────────────────────────────────
