@@ -119,7 +119,7 @@ The project includes a GitHub Actions workflow at [`.github/workflows/ci.yml`](.
 
 **`build` job (main/master only):**
 - Packages the fat JAR: `./mvnw package -DskipTests -pl sm-shop -am`
-- Uploads `shopizer.jar` as a GitHub Actions artifact (30-day retention, named `shopizer-jar-<git-sha>`)
+- Uploads `shopizer.jar` as a GitHub Actions artifact (90-day retention, named `shopizer-<version>-<git-sha>`)
 - Builds and pushes the Docker image to `ghcr.io/<owner>/shopizer:latest` and `ghcr.io/<owner>/shopizer:<sha>` using the built-in `GITHUB_TOKEN` — **no extra secrets required**
 
 #### One-time GitHub Repository Setup
@@ -208,7 +208,7 @@ gh auth login
 
 This will:
 1. Find the latest successful `ci.yml` run on `main`/`master`
-2. Download the `shopizer-jar-<sha>` artifact to `/tmp/shopizer-run/`
+2. Download the `shopizer-<version>-<sha>` artifact to `/tmp/shopizer-run/`
 3. Start a MySQL 8 container locally
 4. Run `java -jar shopizer.jar` with the MySQL spring profile
 

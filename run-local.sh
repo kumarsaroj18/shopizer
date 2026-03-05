@@ -105,6 +105,8 @@ check_cmd docker "Install Docker: https://docs.docker.com/get-docker/"
 if [[ "$MODE" == "jar" ]]; then
   check_cmd java "Install Java 11+: https://adoptium.net/"
   check_cmd gh   "Install GitHub CLI: https://cli.github.com/"
+  check_cmd jq   "Install jq: brew install jq (macOS) or apt install jq (Linux)"
+  check_cmd unzip "Install unzip (usually pre-installed)"
 fi
 if [[ "$MODE" == "local" ]]; then
   check_cmd java "Install Java 11+: https://adoptium.net/"
@@ -226,6 +228,12 @@ run_jar_mode() {
   fi
 
   JAR_DIR="/tmp/shopizer-run"
+  
+  # Clean up any previous artifacts
+  if [[ -d "$JAR_DIR" ]]; then
+    info "Cleaning up previous artifacts..."
+    rm -rf "$JAR_DIR"
+  fi
   mkdir -p "$JAR_DIR"
 
   info "Fetching latest successful workflow run from ${OWNER}/${REPO}..."
@@ -245,13 +253,85 @@ run_jar_mode() {
     exit 1
   fi
 
-  info "Found successful run ID: $RUN_ID. Downloading artifact..."
+  info "Found successful run ID: $RUN_ID"
+  
+  # Get artifact details
+  info "Fetching artifact details..."
+  ARTIFACT_JSON=$(gh api \
+    "/repos/${OWNER}/${REPO}/actions/runs/${RUN_ID}/artifacts" \
+    --jq '.artifacts[] | select(.name | startswith("shopizer-")) | {id: .id, name: .name, size: .size_in_bytes}' \
+    | head -1)
+  
+  if [[ -z "$ARTIFACT_JSON" ]]; then
+    error "No shopizer artifact found in workflow run $RUN_ID"
+    exit 1
+  fi
+  
+  ARTIFACT_ID=$(echo "$ARTIFACT_JSON" | jq -r '.id')
+  ARTIFACT_NAME=$(echo "$ARTIFACT_JSON" | jq -r '.name')
+  ARTIFACT_SIZE=$(echo "$ARTIFACT_JSON" | jq -r '.size')
+  ARTIFACT_SIZE_MB=$((ARTIFACT_SIZE / 1024 / 1024))
+  
+  info "Found artifact: ${ARTIFACT_NAME} (${ARTIFACT_SIZE_MB}MB)"
+  info "Downloading artifact..."
+  echo ""
+  
+  # Download using gh api and stream with progress indicator
+  ARTIFACT_ZIP="${JAR_DIR}/${ARTIFACT_NAME}.zip"
+  
+  # Use gh to download with curl for progress
+  if command -v pv &>/dev/null; then
+    # If pv is available, use it for progress
+    gh api "/repos/${OWNER}/${REPO}/actions/artifacts/${ARTIFACT_ID}/zip" > "$ARTIFACT_ZIP" 2>&1 &
+    DOWNLOAD_PID=$!
+    
+    # Show progress while downloading
+    while kill -0 $DOWNLOAD_PID 2>/dev/null; do
+      if [[ -f "$ARTIFACT_ZIP" ]]; then
+        CURRENT_SIZE=$(stat -f%z "$ARTIFACT_ZIP" 2>/dev/null || stat -c%s "$ARTIFACT_ZIP" 2>/dev/null || echo 0)
+        CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+        PERCENT=$((CURRENT_SIZE * 100 / ARTIFACT_SIZE))
+        printf "\r${BLUE}[INFO]${NC}  Downloaded: ${CURRENT_MB}MB / ${ARTIFACT_SIZE_MB}MB (${PERCENT}%%)"
+      fi
+      sleep 1
+    done
+    wait $DOWNLOAD_PID
+    printf "\r${BLUE}[INFO]${NC}  Downloaded: ${ARTIFACT_SIZE_MB}MB / ${ARTIFACT_SIZE_MB}MB (100%%)  \n"
+  else
+    # Fallback: show size updates during download
+    gh api "/repos/${OWNER}/${REPO}/actions/artifacts/${ARTIFACT_ID}/zip" > "$ARTIFACT_ZIP" 2>&1 &
+    DOWNLOAD_PID=$!
+    
+    # Show progress while downloading
+    printf "${BLUE}[INFO]${NC}  Downloading"
+    while kill -0 $DOWNLOAD_PID 2>/dev/null; do
+      if [[ -f "$ARTIFACT_ZIP" ]]; then
+        CURRENT_SIZE=$(stat -f%z "$ARTIFACT_ZIP" 2>/dev/null || stat -c%s "$ARTIFACT_ZIP" 2>/dev/null || echo 0)
+        CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+        printf "\r${BLUE}[INFO]${NC}  Downloading... ${CURRENT_MB}MB / ${ARTIFACT_SIZE_MB}MB"
+      else
+        printf "."
+      fi
+      sleep 1
+    done
+    wait $DOWNLOAD_PID
+    printf "\r${BLUE}[INFO]${NC}  Downloading... ${ARTIFACT_SIZE_MB}MB / ${ARTIFACT_SIZE_MB}MB - Complete!  \n"
+  fi
+  
+  echo ""
+  
+  # Check if download was successful
+  if [[ ! -f "$ARTIFACT_ZIP" ]] || [[ ! -s "$ARTIFACT_ZIP" ]]; then
+    error "Download failed or file is empty"
+    exit 1
+  fi
+  
+  info "Extracting artifact..."
+  unzip -q "$ARTIFACT_ZIP" -d "${JAR_DIR}/${ARTIFACT_NAME}"
+  rm "$ARTIFACT_ZIP"
 
-  gh run download "$RUN_ID" \
-    --repo "${OWNER}/${REPO}" \
-    --pattern "shopizer-jar-*" \
-    --dir "$JAR_DIR"
-
+  success "Download complete"
+  
   DOWNLOADED_JAR=$(find "$JAR_DIR" -name "shopizer.jar" | head -1)
   if [[ -z "$DOWNLOADED_JAR" ]]; then
     error "Could not find shopizer.jar in downloaded artifacts."
